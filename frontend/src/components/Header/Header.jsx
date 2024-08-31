@@ -82,6 +82,7 @@ export default function Header() {
             </button>
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+               {user && <Link to="/userprofile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</Link>}
                 <Link to="/about" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">About</Link>
                 <Link to="/services" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Services</Link>
                 <Link to="/contact" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Contact</Link>

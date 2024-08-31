@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { BAD_REQUEST, CREATED, UNAUTHORIZED } = require('../constants/httpStatus');
+const { BAD_REQUEST, CREATED, UNAUTHORIZED, OK } = require('../constants/httpStatus');
 const User = require('../models/user');
 
 const router = express.Router();
@@ -29,7 +29,6 @@ const generateTokenResponse = (user) => {
     token,
   };
 };
-
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -60,8 +59,6 @@ router.post('/register', async (req, res) => {
     res.status(BAD_REQUEST).json({ error: 'Registration failed. Please try again.' });
   }
 });
-
-
 
 // Authenticate a user
 router.post('/login', async (req, res) => {
@@ -94,6 +91,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Get all users
 router.get('/', async (req, res) => {
   try {
     const users = await User.find({});
@@ -102,6 +100,7 @@ router.get('/', async (req, res) => {
     res.status(BAD_REQUEST).json({ error: err.message });
   }
 });
+
 // Delete a user by ID
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
@@ -120,6 +119,28 @@ router.delete('/:id', async (req, res) => {
   } catch (err) {
     console.error('Error deleting user:', err.message);
     res.status(BAD_REQUEST).json({ error: 'Failed to delete user. Please try again.' });
+  }
+});
+
+// Update user role by ID
+router.put('/:id/role', async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  try {
+    // Find the user by ID and update the role
+    const updatedUser = await User.findByIdAndUpdate(id, { role }, { new: true });
+
+    // Check if the user was found and updated
+    if (!updatedUser) {
+      return res.status(UNAUTHORIZED).json({ error: 'User not found' });
+    }
+
+    // Respond with the updated user information
+    res.status(OK).json(updatedUser);
+  } catch (err) {
+    console.error('Error updating user role:', err.message);
+    res.status(BAD_REQUEST).json({ error: 'Failed to update user role. Please try again.' });
   }
 });
 

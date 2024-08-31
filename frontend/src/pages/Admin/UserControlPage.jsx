@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getAllusers, deleteUser } from '../../services/userServices';
+import { getAllusers, deleteUser, updateUserRole } from '../../services/userServices';
 
 const UserControlPage = () => {
   const [users, setUsers] = useState([]);
   const [editMode, setEditMode] = useState(false);
-  const [message, setMessage] = useState(''); // State to hold the confirmation message
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -26,6 +26,7 @@ const UserControlPage = () => {
   const changeUserRole = async (id, newRole) => {
     if (!editMode) return;
     try {
+      await updateUserRole(id, newRole); // Update user role in the backend
       const updatedUsers = users.map(user =>
         user._id === id ? { ...user, role: newRole } : user
       );
@@ -36,17 +37,19 @@ const UserControlPage = () => {
     }
   };
 
-  const removeUser = async (id) => {
-    if (!editMode) return;
+  const removeUser = async (id, role) => {
+    if (!editMode || role === 'admin') {
+      setMessage('Admin users cannot be deleted.');
+      return;
+    }
     try {
-      await deleteUser(id); // Call the deleteUser function from services
-      setUsers(prevUsers => 
+      await deleteUser(id);
+      setUsers(prevUsers =>
         prevUsers.filter(user => user._id !== id)
-      ); // Update local state
-      setMessage('User deleted successfully!'); // Set success message
+      );
+      setMessage('User deleted successfully!');
       console.log(`Deleted user ${id}`);
       
-      // Clear the message after a few seconds
       setTimeout(() => {
         setMessage('');
       }, 3000);
@@ -86,21 +89,25 @@ const UserControlPage = () => {
               <tr key={user._id} className={`transition-opacity duration-500 ${user.removing ? 'opacity-0' : 'opacity-100'}`}>
                 <td className="py-2 px-4 border-b">{user.name}</td>
                 <td className="py-2 px-4 border-b">
-                  <select
-                    value={user.role}
-                    onChange={(e) => changeUserRole(user._id, e.target.value)}
-                    className="border border-gray-300 p-2 rounded"
-                    disabled={!editMode}
-                  >
-                    <option value="user">user</option>
-                    <option value="admin">admin</option>
-                  </select>
+                  {editMode ? (
+                    <select
+                      value={user.role}
+                      onChange={(e) => changeUserRole(user._id, e.target.value)}
+                      className="border border-gray-300 p-2 rounded bg-white appearance-none"
+                      style={{ width: '100%', maxWidth: '150px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
+                    >
+                      <option value="user">user</option>
+                      <option value="admin">admin</option>
+                    </select>
+                  ) : (
+                    <span>{user.role}</span>
+                  )}
                 </td>
                 <td className="py-2 px-4 border-b">
                   <button 
-                    onClick={() => removeUser(user._id)}
+                    onClick={() => removeUser(user._id, user.role)}
                     className="px-4 py-2 bg-red-500 text-white rounded"
-                    disabled={!editMode}
+                    disabled={!editMode || user.role === 'admin'}
                   >
                     Delete
                   </button>

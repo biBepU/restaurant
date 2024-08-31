@@ -61,3 +61,9 @@ export const deleteUser = async (id) => {
   const response = await axios.delete(`api/users/${id}`);
   return response.data; // This will be the response from your API
 };
+
+//  function to update user role
+export const updateUserRole = async (id, newRole) => {
+  const response = await axios.put(`/api/users/${id}/role`, { role: newRole });
+  return response.data;
+};
