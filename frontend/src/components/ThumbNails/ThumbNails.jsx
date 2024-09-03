@@ -24,7 +24,7 @@ export default function ThumbNails({ foods }) {
           >
             <img
               className="object-cover h-[14.5rem] w-full"
-              src={`http://localhost:5000/${food.imageUrl}`}
+              src={`https://restaurant-42ss.onrender.com/${food.imageUrl}`}
               alt={`Image of ${food.name}`}
             />
             <div className="mt-[0.3rem] p-[0.5rem_1rem] h-[7rem] flex flex-col">

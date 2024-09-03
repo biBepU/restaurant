@@ -65,7 +65,7 @@ export default function Header() {
               </span>
             )}
           </Link>}
-          {(user && user.role=="admin")&&<Link to="/create" className="text-gray-300 hover:text-white">Create</Link>}
+          
           <div className="relative">
             <button 
               onClick={toggleDropdown} 

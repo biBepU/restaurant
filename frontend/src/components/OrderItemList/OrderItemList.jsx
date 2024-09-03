@@ -19,7 +19,7 @@ export default function OrderItemList({order}) {
                 <tr key={item.id}>
                   <td>
                     <Link to={`/food/${item.food.id}`}>
-                        <img src={`http://localhost:5000/${item.food.imageUrl}`}/>
+                        <img src={`https://restaurant-42ss.onrender.com/${item.food.imageUrl}`}/>
                     </Link>
                   </td>
                   <td>{item.food.name}</td>

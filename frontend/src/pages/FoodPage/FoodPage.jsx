@@ -67,7 +67,7 @@ export default function FoodPage() {
                 <div className="flex justify-center items-center flex-wrap m-[3rem]">
                     <img
                         className="rounded-[3rem] flex-1 object-cover h-[35rem] m-[1rem]"
-                        src={`http://localhost:5000/${food.imageUrl}`}
+                        src={`https://restaurant-42ss.onrender.com/${food.imageUrl}`}
                         alt={food.name}
                     />
                     <div className="w-full flex flex-col flex-1 rounded-[3rem] p-[2rem] text-black ml-[1rem]">

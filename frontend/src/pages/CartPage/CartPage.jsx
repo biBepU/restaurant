@@ -31,7 +31,7 @@ export default function CartPage() {
               <li key={item.food.id} className='flex items-center justify-between border-b border-[#e4e4e4] py-2 last:border-none'>
                 <div className='flex-shrink-0'>
                   <img
-                   src={`http://localhost:5000/${item.food.imageUrl}`}
+                   src={`https://restaurant-42ss.onrender.com/${item.food.imageUrl}`}
                     alt={item.food.name}
                     className='w-20 h-20 rounded-full object-cover'
                   />
