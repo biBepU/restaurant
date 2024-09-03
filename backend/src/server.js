@@ -18,11 +18,11 @@ app.use(express.json());
 app.use(
   cors({
     credentials: true,
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:5173'], // Adjust this to your Vite frontend URL
   })
 );
 
-// Serve static files
+// Serve static files for uploads
 app.use('/uploads', express.static('uploads'));
 
 // Environment Variables
@@ -37,30 +37,26 @@ mongoose.connect(MONGO_URI)
     process.exit(1); // Exit process with failure
   });
 
-// Base Route
-app.get('/', (req, res) => {
-  res.send('Static file server is running.');
-});
-
 // Route Definitions
 app.use('/api/users', userRoutes);
 app.use('/api/foods', foodRoutes);
 app.use('/api/orders', orderRouter);
 app.use('/api/rate', ratingMiddleware, ratingRoutes);
 
+// Serve the React app from the build folder
+const publicFolder = path.join(__dirname, 'public'); 
+app.use(express.static(publicFolder));
+
+// Catch-all route to serve index.html for React Router
+app.get('*', (req, res) => {
+  const indexFilePath = path.join(publicFolder, 'index.html');
+  res.sendFile(indexFilePath);
+});
+
 // Global Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err);
   res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
-});
-
-// Serve React App from the build folder
-const publicFolder = path.join(__dirname, 'public');
-app.use(express.static(publicFolder));
-
-app.get('*', (req, res) => {
-  const indexFilePath = path.join(publicFolder, 'index.html');
-  res.sendFile(indexFilePath);
 });
 
 // Start Server
