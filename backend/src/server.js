@@ -1,15 +1,15 @@
-// backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 
 const userRoutes = require('./routers/user');
 const foodRoutes = require('./routers/food');
 const orderRouter = require('./routers/order');
-const ratingRoutes = require('./routers/rating.js')
+const ratingRoutes = require('./routers/rating.js');
+const ratingMiddleware = require('./middleware/rating.middleware.js');
 
-const ratingMiddleware = require('./middleware/rating.middleware.js')
 dotenv.config();
 
 const app = express();
@@ -46,6 +46,15 @@ app.use('/api/rate', ratingMiddleware, ratingRoutes);
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err);
   res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
+});
+
+// Serve React App from the build folder
+const publicFolder = path.join(__dirname, 'public');
+app.use(express.static(publicFolder));
+
+app.get('*', (req, res) => {
+  const indexFilePath = path.join(publicFolder, 'index.html');
+  res.sendFile(indexFilePath);
 });
 
 // Start Server
