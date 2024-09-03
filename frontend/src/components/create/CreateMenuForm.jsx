@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getById, create, update } from '../api/foodService'; // Adjust the import path as needed
 
 const FoodForm = () => {
-  const { id } = useParams(); // To differentiate between create and edit
+  const { id } = useParams();
   const navigate = useNavigate();
   const [foodData, setFoodData] = useState({
     name: '',
@@ -18,13 +18,12 @@ const FoodForm = () => {
   });
   const [responseMessage, setResponseMessage] = useState(null);
 
-  console.log(id)
   useEffect(() => {
     if (id) {
       const fetchFood = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/foods/${id}`);
-          setFoodData(response.data);
+          const data = await getById(id);
+          setFoodData(data);
         } catch (error) {
           console.error('Error fetching food data:', error);
         }
@@ -56,24 +55,18 @@ const FoodForm = () => {
     }
 
     try {
-      const url = id ? `http://localhost:5000/api/foods/${id}` : 'http://localhost:5000/api/foods';
-      const method = id ? 'patch' : 'post';
-      const response = await axios[method](url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      setResponseMessage(id ? 'Food item updated successfully!' : 'Food item created successfully!');
+      if (id) {
+        // Update food item
+        await update(id, formData);
+        setResponseMessage('Food item updated successfully!');
+      } else {
+        // Create food item
+        await create(formData);
+        setResponseMessage('Food item created successfully!');
+      }
       navigate('/');
     } catch (error) {
-      if (error.response) {
-        console.error('Server Error:', error.response.data);
-      } else if (error.request) {
-        console.error('Network Error:', error.message);
-      } else {
-        console.error('Error:', error.message);
-      }
+      console.error('Error:', error);
       setResponseMessage(id ? 'Error updating food item.' : 'Error creating food item.');
     }
   };

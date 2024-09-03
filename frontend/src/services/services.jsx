@@ -42,3 +42,13 @@ export const create = async formData =>{
     return data
 }
 
+export const update = async (foodId, formData) => {
+    const { data } = await axios.patch(`/api/foods/${foodId}`, formData, {
+        headers: {
+            Accept: 'multipart/form-data'
+        }
+    });
+    return data;
+};
+
+
