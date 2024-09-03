@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getById, create, update } from '../api/foodService'; // Adjust the import path as needed
+import { getById, create, update } from '../../services/services'; // Adjust the import path as needed
 
 const FoodForm = () => {
   const { id } = useParams();
