@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { BAD_REQUEST, CREATED, UNAUTHORIZED, OK } = require('../constants/httpStatus');
@@ -6,7 +7,6 @@ const User = require('../models/user');
 
 const router = express.Router();
 
-const PASSWORD_HASH_SALT_ROUNDS = 10;
 
 // Helper function to generate JWT token
 const generateTokenResponse = (user) => {
@@ -25,6 +25,7 @@ const generateTokenResponse = (user) => {
     email: user.email,
     name: user.name,
     address: user.address,
+    phone: user.phone,
     role: user.role,
     token,
   };
@@ -73,9 +74,7 @@ router.post('/login', async (req, res) => {
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Stored hashed password:', user.password);
-    console.log('Provided password:', password);
-    console.log('Password match:', isMatch); // Check if the passwords match
+  
 
     if (!isMatch) {
       return res.status(UNAUTHORIZED).json({ error: 'Invalid password' });
@@ -83,7 +82,7 @@ router.post('/login', async (req, res) => {
 
     // Generate token and send response
     const tokenResponse = generateTokenResponse(user);
-    console.log('Token generated on login:', tokenResponse.token);
+   
     res.json(tokenResponse);
   } catch (err) {
     console.error('Login error:', err.message);
@@ -143,5 +142,66 @@ router.put('/:id/role', async (req, res) => {
     res.status(BAD_REQUEST).json({ error: 'Failed to update user role. Please try again.' });
   }
 });
+
+// Update user profile
+router.put('/profile/:id', async (req, res) => {
+  const { name, email, address, phone } = req.body;
+  const { id } = req.params;
+  console.log(phone)
+  // Validate the user ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(BAD_REQUEST).json({ error: 'Invalid user ID' });
+  }
+
+  try {
+    // Find the user and update their profile
+    const updatedUser = await User.findByIdAndUpdate(id, { name, email, address, phone }, { new: true });
+
+    if (!updatedUser) {
+      return res.status(UNAUTHORIZED).json({ error: 'User not found' });
+    }
+
+    res.status(OK).json(updatedUser);
+  } catch (err) {
+    console.error('Error updating profile:', err.message);
+    res.status(BAD_REQUEST).json({ error: 'Failed to update profile. Please try again.' });
+  }
+});
+
+// Change user password
+router.put('/change-password/:id', async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const { id } = req.params;
+
+  // Validate the user ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(BAD_REQUEST).json({ error: 'Invalid user ID' });
+  }
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(UNAUTHORIZED).json({ error: 'User not found' });
+    }
+
+    // Check old password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(UNAUTHORIZED).json({ error: 'Old password is incorrect' });
+    }
+
+    
+    user.password = newPassword
+    await user.save();
+
+    res.status(OK).json({ message: 'Password changed successfully' });
+  } catch (err) {
+    console.error('Error changing password:', err.message);
+    res.status(BAD_REQUEST).json({ error: 'Failed to change password. Please try again.' });
+  }
+});
+
+module.exports = router;
+
 
 module.exports = router;

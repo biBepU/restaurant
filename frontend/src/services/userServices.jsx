@@ -67,3 +67,49 @@ export const updateUserRole = async (id, newRole) => {
   const response = await axios.put(`/api/users/${id}/role`, { role: newRole });
   return response.data;
 };
+
+export const updateUserProfile = async (profileData,userId) => {
+  console.log(userId)
+  try {
+
+    const token = getAuthToken(); // Get the auth token from local storage
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.put(`/api/users/profile/${userId}`, profileData, config);
+    console.log(data)
+    // Update the user details in local storage
+    localStorage.setItem('user', JSON.stringify({
+      id: data._id,
+      email: data.email,
+      name: data.name,
+      address: data.address,
+      role: data.role,
+    }));
+
+    return data;
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    throw error.response?.data || error.message;
+  }
+};
+export const changeUserPassword = async (oldPassword, newPassword,userId) => {
+  try {
+    const token = getAuthToken(); // Get the auth token from local storage
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.put(`/api/users/change-password/${userId}`, { oldPassword, newPassword}, config);
+
+    return data; // This will return the success message from the API
+  } catch (error) {
+    console.error('Error changing password:', error);
+    throw error.response?.data || error.message;
+  }
+};

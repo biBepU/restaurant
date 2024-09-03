@@ -19,10 +19,11 @@ import OrdersPage from "./pages/Admin/OrdersPage";
 import OrderHistoryPage from "./pages/Admin/OrdersHistory";
 import UserOrderHistory from "./pages/UserOrderHistory/UserOrderHistory";
 import RateFood from "./components/Rating/Rating";
-import DashBoard from "./pages/Admin/DashBoard";
+
 import AllFoodPage from "./pages/AllFoodPage/AllFoodPage";
 import NotFound from "./components/NotFound/NotFound.jsx";
 import UserProfilePage from "./pages/UserProfile/UserProfile.jsx";
+import AuthForLogin from "./components/AuthForLogin.jsx";
 
 // Define the router
 const router = createBrowserRouter(
@@ -54,10 +55,8 @@ const router = createBrowserRouter(
         <FoodPage />, // Food page accessible from home and admin
       },
     
-      {
-        path: '/profile',
-        element: <Home />
-      },
+      
+       
       {
         path: '/about',
         element: <About />
@@ -72,11 +71,19 @@ const router = createBrowserRouter(
       },
       {
         path: '/userprofile',
-        element: <UserProfilePage />
+        element: 
+        <AuthForLogin>
+
+          <UserProfilePage />
+        </AuthForLogin>
       },
       {
         path: '/rating/:id',
-        element: <RateFood />
+        element: 
+        <AuthForLogin>
+          <RateFood />
+
+        </AuthForLogin>
       },
       {
         path: '/create/:id',
@@ -119,7 +126,11 @@ const router = createBrowserRouter(
       },
       {
         path: '/userorderhistory',
-        element: <UserOrderHistory />
+        element: 
+        <AuthForLogin>
+
+          <UserOrderHistory />
+        </AuthForLogin>
       },
       {
         path: '/orders',
@@ -127,7 +138,11 @@ const router = createBrowserRouter(
       },
       {
         path: '/checkout',
-        element: <Checkout />
+        element:
+        <AuthForLogin>
+
+          <Checkout />
+        </AuthForLogin>
       },
       {
         path: 'login',

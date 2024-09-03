@@ -1,9 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../hook/useAuth';
+import {  useNavigate } from 'react-router-dom';
+import UpdateProfileModal from '../../components/UpdatProfileModal/UpdateProfileModal';
+import ChangePasswordModal from '../../components/ChangePassword/ChangePassword';
 
 const UserProfilePage = () => {
+  const { user, updateProfile, changePassword } = useAuth();
+  const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+  const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
+  const userId = user.id;
+  console.log(user)
+  
+  const navigate = useNavigate();
+  const handleUpdateProfile = async (profileData) => {
+    await updateProfile(profileData,userId);
+    setProfileModalOpen(false);
+  };
 
-    const {user} = useAuth();
+  const handleChangePassword = async (passwords) => {
+    await changePassword(passwords,userId);
+    setPasswordModalOpen(false);
+    navigate('/login')
+
+  };
+
+  
   return (
     <div className="bg-gray-50 text-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       {/* Header Section */}
@@ -34,23 +55,24 @@ const UserProfilePage = () => {
             <label className="block text-lg font-medium text-gray-700">
               Phone Number
             </label>
-            <p className="mt-1 p-3 bg-gray-100 border border-gray-300 rounded-md">+1 234 567 890</p>
+            <p className="mt-1 p-3 bg-gray-100 border border-gray-300 rounded-md">{user.phone}</p>
           </div>
           <div>
             <label className="block text-lg font-medium text-gray-700">
               Address
             </label>
-            <p className="mt-1 p-3 bg-gray-100 border border-gray-300 rounded-md">123 Main St, City, State </p>
+            <p className="mt-1 p-3 bg-gray-100 border border-gray-300 rounded-md">{user.address}</p>
           </div>
         </div>
         <div className="text-right mt-6">
-          <button className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-700">
+          <button
+            className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-700"
+            onClick={() => setProfileModalOpen(true)}
+          >
             Edit Profile
           </button>
         </div>
       </section>
-
-     
 
       {/* Settings Section */}
       <section className="bg-white shadow rounded-lg p-6">
@@ -59,19 +81,39 @@ const UserProfilePage = () => {
           {/* Change Password */}
           <div>
             <h3 className="text-lg font-semibold text-gray-700 mb-2">Change Password</h3>
-            <button className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-700">
+            <button
+              className="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-700"
+              onClick={() => setPasswordModalOpen(true)}
+            >
               Change Password
             </button>
           </div>
-          {/* Delete Account */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Delete Account</h3>
-            <button className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">
-              Delete Account
-            </button>
-          </div>
+          
         </div>
       </section>
+
+      {/* Modals */}
+      {isProfileModalOpen && (
+        <UpdateProfileModal
+          isOpen={isProfileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          onSave={handleUpdateProfile}
+          initialData={{
+            name: user.name,
+            email: user.email,
+            phone:user.phone,
+            address: user.address,
+          }}
+        />
+      )}
+
+      {isPasswordModalOpen && (
+        <ChangePasswordModal
+          isOpen={isPasswordModalOpen}
+          onClose={() => setPasswordModalOpen(false)}
+          onSave={handleChangePassword}
+        />
+      )}
     </div>
   );
 };

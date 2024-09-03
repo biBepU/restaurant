@@ -9,21 +9,21 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const user = await userService.login(email, password);
-      setUser(user); 
+      const loggedInUser = await userService.login(email, password);
+      setUser(loggedInUser); 
       toast.success('Login Successful');
     } catch (err) {
-      toast.error(err.response.data);
+      toast.error(err.response?.data || 'Login failed. Please try again.');
     }
   };
 
-  const register = async data => {
+  const register = async (data) => {
     try {
-      const user = await userService.register(data);
-      setUser(user);
+      const registeredUser = await userService.register(data);
+      setUser(registeredUser);
       toast.success('Register Successful');
     } catch (err) {
-      toast.error(err.response.data);
+      toast.error(err.response?.data || 'Registration failed. Please try again.');
     }
   };
 
@@ -33,16 +33,27 @@ export const AuthProvider = ({ children }) => {
     toast.success('Logout Successful');
   };
 
-  const updateProfile = async user => {
-    const updatedUser = await userService.updateProfile(user);
-    toast.success('Profile Update Was Successful');
-    if (updatedUser) setUser(updatedUser);
+  const updateProfile = async (profileData,userId) => {
+    
+    try {
+      const updatedUser = await userService.updateUserProfile(profileData,userId);
+      if (updatedUser) {
+        setUser(updatedUser);
+        toast.success('Profile Update Was Successful');
+      }
+    } catch (err) {
+      toast.error(err.response?.data || 'Profile update failed. Please try again.');
+    }
   };
 
-  const changePassword = async passwords => {
-    await userService.changePassword(passwords);
-    logout();
-    toast.success('Password Changed Successfully, Please Login Again!');
+  const changePassword = async (passwords,userId) => {
+    try {
+      await userService.changeUserPassword(passwords.oldPassword, passwords.newPassword,userId);
+      logout();
+      toast.success('Password Changed Successfully, Please Login Again!');
+    } catch (err) {
+      toast.error(err.response?.data || 'Password change failed. Please try again.');
+    }
   };
 
   return (
